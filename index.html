@@ -1,0 +1,298 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="An end-to-end, map-free UUV multi-waypoint controller combining adaptive distributional reinforcement learning with domain randomization for robust tracking in uncertain underwater environments.">
+  <title>Autonomous UUV Control for Multi-Waypoint Tracking through Distributional Reinforcement Learning</title>
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="bar-inner">
+    <a class="brand" href="#top">TAQC</a>
+    <nav><a href="#motivation">Motivation</a><a href="#framework">Framework</a><a href="#baselines">Baselines</a><a href="#metrics">Metrics</a><a href="#experiments">Experiments</a><a href="#conclusion">Current Status</a></nav>
+    <a class="lang" href="cn/index.html">中文</a>
+  </div>
+</header>
+<main class="page" id="top">
+  <section class="landing">
+    <h1>Autonomous UUV Control for Multi-Waypoint Tracking through Distributional Reinforcement Learning</h1>
+    <div class="subtitle">TAQC: Truncated Adaptive Quantile Critics</div>
+    <p class="intro">An end-to-end, map-free UUV multi-waypoint controller combining adaptive distributional reinforcement learning with domain randomization for robust tracking in uncertain underwater environments.</p>
+
+    <h2>Main contributions</h2>
+    <ul class="feature-bullets"><li><b>End-to-end UUV tracking control：</b>RL framework for sequential waypoint tracking.</li><li><b>Distributional RL：</b>Return-distribution modeling improves learning efficiency and stability.</li><li><b>TAQC method：</b>TQC extended with a learnable fraction proposal network and a mass-weighted critic loss.</li><li><b>Domain randomization：</b>Enhance the generalization capability for unseen trajectories under disturbances.</li></ul>
+
+    <section id="motivation" class="section first-section">
+      <h2>Research motivation</h2>
+      <div class="text-block"><p>Traditional UUV path-following methods have shown good performance in various conditions. However, complex underwater environments and changing task requirements call for more adaptive control methods. Reinforcement learning (RL) offers a promising approach by learning control policies through interactions with the environment.</p><p>Conventional reinforcement learning methods, such as PPO and SAC, mainly rely on expected returns for value estimation without explicitly modeling the full return distribution, potentially overlooking return variability. In addition, some existing distributional reinforcement learning methods use fixed quantile locations, limiting their ability to represent complex return distributions. Therefore, we explore a more flexible approach to return distribution modeling to potentially improve learning efficiency and stability.</p><p>Reinforcement learning policies may overfit to training conditions, leading to performance degradation in unseen environments or tasks. Therefore, we adopt domain randomization to improve policy adaptability to environmental changes and enhance generalization across different conditions.</p></div>
+      <div class="summary-grid"><div class="summary-card"><div class="num">1</div><p><b>End-to-end control</b></p><p>End-to-end reinforcement learning enables UUVs to learn control policies directly from state observations to control commands, reducing the need for accurate hydrodynamic models and simplifying controller design. This approach also allows UUVs to learn coordinated control actions through interaction with the environment, offering a flexible solution for path following under uncertain underwater conditions.</p></div><div class="summary-card"><div class="num">2</div><p><b>Adaptive quantile representation</b></p><p>An FPN generates non-uniform quantile fractions for flexible return-distribution modeling.</p></div><div class="summary-card"><div class="num">3</div><p><b>Truncated multi-critic learning</b></p><p>A pooled multi-critic target with truncation is used to reduce overestimation and improve stability.</p></div><div class="summary-card"><div class="num">4</div><p><b>Domain randomization</b></p><p>Training-time randomization of disturbances, parameters, and initial states improves robustness and generalization.</p></div></div>
+    </section>
+  </section>
+
+  <section id="framework" class="section">
+    <h2>Algorithmic framework</h2>
+    <p>Building upon TQC, TAQC explicitly models the return distribution within a distributional reinforcement learning framework. Its main components include a learnable Fraction Proposal Network (FPN), multiple quantile critics, a truncation mechanism for the upper tail of the mixture distribution, and domain randomization throughout training.</p>
+    <ul>
+      <li><b>End-to-end control：</b>End-to-end reinforcement learning directly learns the mapping from state observations to control commands through environmental interactions, reducing reliance on accurate dynamic models and simplifying controller design. </li><li><b>Adaptive fraction proposal：</b>The FPN generates non-uniform quantile fractions conditioned on each state-action pair. </li><li><b>Multi-critic truncation：</b>Quantile atoms from target critics are pooled into a mixture and the right tail is truncated to reduce overestimation. </li><li><b>Mass-weighted critic loss：</b>The critic objective is reconstructed so that each quantile term is weighted by its interval probability mass. </li><li><b>Domain randomization：</b>Ocean disturbances, hydrodynamic parameters, and initial states are randomized during training. </li>
+    </ul>
+    <div class="figure-stack framework-figures">
+    <figure class="paper-figure wide">
+      <a href="assets/img/com_clean.png" target="_blank" aria-label="Open full image">
+        <img src="assets/img/com_clean.png" alt="Overall TAQC framework" loading="lazy">
+      </a>
+      <figcaption>
+        <h4>Overall TAQC framework</h4>
+        <p>The main components of the proposed method, including FPN, quantile critics, truncation, and domain randomization.</p>
+      </figcaption>
+    </figure>
+    
+    <figure class="paper-figure wide">
+      <a href="assets/img/FPN.webp" target="_blank" aria-label="Open full image">
+        <img src="assets/img/FPN.webp" alt="Construction of the target return distribution" loading="lazy">
+      </a>
+      <figcaption>
+        <h4>Construction of the target return distribution</h4>
+        <p>The FPN generates adaptive quantile intervals and the target critics construct the truncated target distribution.</p>
+      </figcaption>
+    </figure>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>Task description</h2>
+    <p>The UUV starts from a randomized initial region and tracks a sequence of waypoints under disturbances. When the 3D distance to the current waypoint falls below a threshold, the target switches to the next waypoint. The problem is formulated as a continuous-state, continuous-action reinforcement-learning task.</p>
+    <div class="figure-stack task-figures">
+    <figure class="paper-figure medium">
+      <a href="assets/img/example2.webp" target="_blank" aria-label="Open full image">
+        <img src="assets/img/example2.webp" alt="Multi-waypoint tracking task" loading="lazy">
+      </a>
+      <figcaption>
+        <h4>Multi-waypoint tracking task</h4>
+        <p>Task process of sequential waypoint tracking under disturbances.</p>
+      </figcaption>
+    </figure>
+    
+    <figure class="paper-figure medium">
+      <a href="assets/img/rov.webp" target="_blank" aria-label="Open full image">
+        <img src="assets/img/rov.webp" alt="UUV coordinate systems" loading="lazy">
+      </a>
+      <figcaption>
+        <h4>UUV coordinate systems</h4>
+        <p>The manuscript uses the NED frame and the body-fixed frame to describe UUV motion.</p>
+      </figcaption>
+    </figure>
+    </div>
+  </section>
+
+  <section id="baselines" class="section">
+    <h2>Baselines and experimental setting</h2>
+    <p>All experiments are conducted in the bluerov2_gym environment. The 2D training task uses a circle of radius 5 m; the 3D training task uses a helix of the same radius with 30 waypoints. Each episode lasts at most 800 steps. The training budgets are 500k steps for the 2D task and 1M steps for the 3D task.</p>
+    <h3>Classical control </h3><ul><li><b>FAPID：</b>Fuzzy Adaptive PID as a non-learning controller baseline. </li><li><b>LADRC：</b>Linear Active Disturbance Rejection Control. </li></ul><h3>Expectation-based RL </h3><ul><li><b>PPO：</b>A representative on-policy reinforcement learning algorithm. </li><li><b>SAC：</b>A representative off-policy reinforcement learning algorithm. </li></ul><h3>Distributional RL baselines </h3><ul><li><b>TQC：</b>Truncated Quantile Critics with quantile-distribution learning and truncation, used to evaluate the benefits of adaptive quantile modeling. </li><li><b>TIQC：</b>A comparison algorithm developed in this study by integrating an implicit quantile network into TQC. </li><li><b>DSAC-T：</b>Distributional Soft Actor-Critic with Three Refinements. A recently proposed distributional reinforcement learning algorithm. </li><li><b>TAQC (ours)：</b>TQC extended with a learnable fraction proposal mechanism and mass-weighted critic loss. </li></ul>
+  </section>
+
+  <section id="metrics" class="section">
+    <h2>Evaluation metrics</h2>
+    <ul><li><b>ATE (Average 3D Tracking Error):</b> Mean 3D distance between the agent and the current target waypoint. </li><li><b>ARE (Average Radial Error):</b> Average XY-plane radial error. </li><li><b>AZE (Average Z-Axis Error):</b> Average vertical tracking error. </li><li><b>AHE (Average Heading Error):</b> Average angular difference between actual and desired heading. </li><li><b>SR (Success Rate):</b> Proportion of successful episodes, mainly used in generalization and robustness experiments. </li><li><b>Steps (Episode / Training Steps):</b> Evaluation episodes report completion steps; training additionally reports first-success and convergence steps. </li></ul>
+  </section>
+
+  <section id="experiments" class="section">
+    <h2>Experimental results and analysis</h2>
+    <p>Simulation results for 2D tracking, 3D tracking, unseen trajectories, and disturbance robustness</p>
+    
+        <div class="subsection">
+          <h3>2D path-following experiments</h3>
+          <p>In the 2D circular tracking task, TAQC and TQC reliably solve the task. TAQC converges more efficiently, with lower variance and fewer task-completion steps. DSAC-T occasionally reaches positive rewards without a reliably converged policy, while TIQC, SAC, and PPO fail to learn a consistently successful policy under the tested disturbances. TAQC achieves competitive tracking accuracy while requiring fewer steps to complete the task than TQC.</p>
+          
+          
+          
+    <div class="table-wrap">
+      <div class="table-caption">2D tracking performance comparison (methods reliably completing the task)</div>
+      <table>
+        <thead><tr><th>Metric</th><th>FAPID</th><th>LADRC</th><th>TQC</th><th>TAQC</th></tr></thead>
+        <tbody><tr><td>ATE (m)</td><td>0.8047 ± 0.0131</td><td>0.8914 ± 0.0087</td><td>0.6114 ± 0.0205</td><td>0.6154 ± 0.0116</td></tr><tr><td>ARE (m)</td><td>0.8046 ± 0.0131</td><td>0.8885 ± 0.0077</td><td>0.6016 ± 0.0247</td><td>0.6151 ± 0.0116</td></tr><tr><td>AZE (m)</td><td>0.0071 ± 0.0011</td><td>0.0536 ± 0.0241</td><td>0.0755 ± 0.0119</td><td>0.0230 ± 0.0207</td></tr><tr><td>AHE (rad)</td><td>0.2338 ± 0.0636</td><td>1.6163 ± 0.1357</td><td>0.3872 ± 0.0896</td><td>0.3633 ± 0.0354</td></tr><tr><td>Steps</td><td>423.3 ± 25.0</td><td>1096.1 ± 31.4</td><td>387.3 ± 37.3</td><td>353.0 ± 1.4</td></tr></tbody>
+      </table>
+    </div>
+    
+          <div class="figure-row two-up training-row">
+    <figure class="paper-figure medium">
+      <a href="assets/img/2D__algorithms_reward_comparison.webp" target="_blank" aria-label="Open full image">
+        <img src="assets/img/2D__algorithms_reward_comparison.webp" alt="Mean training reward in 2D" loading="lazy">
+      </a>
+      <figcaption>
+        <h4>Mean training reward in 2D</h4>
+        <p>Mean reward across five independent random seeds, with 95% confidence intervals.</p>
+      </figcaption>
+    </figure>
+    
+    <figure class="paper-figure medium">
+      <a href="assets/img/2D__combo_steps.webp" target="_blank" aria-label="Open full image">
+        <img src="assets/img/2D__combo_steps.webp" alt="2D learning efficiency" loading="lazy">
+      </a>
+      <figcaption>
+        <h4>2D learning efficiency</h4>
+        <p>Training steps to first success and convergence for algorithms that reliably complete the task.</p>
+      </figcaption>
+    </figure>
+    </div>
+        <div class="trajectory-row">
+    <figure class="paper-figure medium">
+      <a href="assets/img/2D__2d.webp" target="_blank" aria-label="Open full image">
+        <img src="assets/img/2D__2d.webp" alt="Example 2D trajectory" loading="lazy">
+      </a>
+      <figcaption>
+        <h4>Example 2D trajectory</h4>
+        <p>A representative trajectory controlled by TAQC under ocean-current disturbances.</p>
+      </figcaption>
+    </figure>
+    </div>
+        </div>
+        
+        <div class="subsection">
+          <h3>3D path-following experiments</h3>
+          <p>For 3D helical waypoint tracking, TAQC and TQC converge to positive returns, with TAQC generally learning faster and more consistently. TIQC exhibits greater variability, DSAC-T learns more slowly, and SAC/PPO do not converge satisfactorily. The tabulated comparison shows TAQC has the lowest ATE and ARE and the fewest evaluation steps among the methods able to reliably complete the task.</p>
+          
+          
+          
+    <div class="table-wrap">
+      <div class="table-caption">3D tracking performance comparison (methods reliably completing the task)</div>
+      <table>
+        <thead><tr><th>Metric</th><th>FAPID</th><th>LADRC</th><th>DSAC-T</th><th>TQC</th><th>TIQC</th><th>TAQC</th></tr></thead>
+        <tbody><tr><td>ATE (m)</td><td>0.6964 ± 0.0094</td><td>0.6805 ± 0.0456</td><td>0.6195 ± 0.0054</td><td>0.6011 ± 0.0067</td><td>0.6115 ± 0.0062</td><td>0.5989 ± 0.0064</td></tr><tr><td>ARE (m)</td><td>0.6860 ± 0.0146</td><td>0.6536 ± 0.0529</td><td>0.6095 ± 0.0083</td><td>0.5930 ± 0.0101</td><td>0.6034 ± 0.0090</td><td>0.5908 ± 0.0080</td></tr><tr><td>AZE (m)</td><td>0.0721 ± 0.0065</td><td>0.1686 ± 0.0276</td><td>0.0820 ± 0.0091</td><td>0.0575 ± 0.0096</td><td>0.0633 ± 0.0095</td><td>0.0578 ± 0.0096</td></tr><tr><td>AHE (rad)</td><td>0.2071 ± 0.0556</td><td>1.2535 ± 0.2218</td><td>0.2829 ± 0.0267</td><td>0.3792 ± 0.0274</td><td>0.4098 ± 0.0278</td><td>0.3675 ± 0.0285</td></tr><tr><td>Steps</td><td>443.5 ± 13.6</td><td>1543.3 ± 152.7</td><td>367.33 ± 8.23</td><td>374.64 ± 8.27</td><td>370.41 ± 10.93</td><td>354.25 ± 6.25</td></tr></tbody>
+      </table>
+    </div>
+    
+          <div class="figure-row two-up training-row">
+    <figure class="paper-figure medium">
+      <a href="assets/img/3D__algorithm_comparison_rewards_by_timestep.webp" target="_blank" aria-label="Open full image">
+        <img src="assets/img/3D__algorithm_comparison_rewards_by_timestep.webp" alt="Mean training reward in 3D" loading="lazy">
+      </a>
+      <figcaption>
+        <h4>Mean training reward in 3D</h4>
+        <p>Average rewards of different agents for the 3D tracking task.</p>
+      </figcaption>
+    </figure>
+    
+    <figure class="paper-figure medium">
+      <a href="assets/img/3D__combo_steps.webp" target="_blank" aria-label="Open full image">
+        <img src="assets/img/3D__combo_steps.webp" alt="3D learning efficiency" loading="lazy">
+      </a>
+      <figcaption>
+        <h4>3D learning efficiency</h4>
+        <p>Comparison of first-success and convergence steps for converging methods.</p>
+      </figcaption>
+    </figure>
+    </div>
+        <div class="trajectory-row">
+    <figure class="paper-figure medium">
+      <a href="assets/img/3D__3D.webp" target="_blank" aria-label="Open full image">
+        <img src="assets/img/3D__3D.webp" alt="Example 3D trajectory" loading="lazy">
+      </a>
+      <figcaption>
+        <h4>Example 3D trajectory</h4>
+        <p>A representative 3D waypoint-following trajectory controlled by the TAQC policy.</p>
+      </figcaption>
+    </figure>
+    </div>
+        </div>
+        
+        <div class="subsection">
+          <h3>3D generalization experiments</h3>
+          <p>The learned 3D policy is evaluated on six previously unseen paths: S-shape, double helix, polyline, figure-eight, conical helix, and comb scanning. TAQC succeeds on all six path families at high rates, whereas several distributional RL baselines encounter low or zero success rates on specific trajectories.</p>
+          <ul><li>TAQC success rates on the six trajectories are 100%, 100%, 100%, 100%, 100%, and 98%, respectively.</li><li>TQC, TIQC, and DSAC-T show failures or substantially reduced success rates on some unseen trajectories.</li></ul>
+          <p class="video-speed-note">Note: These demonstration videos have been sped up for visualization. Playback speed does not represent the UUV’s actual travel speed.</p>
+          
+    <div class="table-wrap">
+      <div class="table-caption">Success rate (%) across six unseen 3D trajectories</div>
+      <table>
+        <thead><tr><th>Algorithm</th><th>S-shape</th><th>Double Helix</th><th>Polyline</th><th>Figure-8</th><th>Conical Helix</th><th>Comb Scanning</th></tr></thead>
+        <tbody><tr><td>FAPID</td><td>100</td><td>100</td><td>100</td><td>90</td><td>100</td><td>80</td></tr><tr><td>LADRC</td><td>100</td><td>100</td><td>100</td><td>70</td><td>100</td><td>80</td></tr><tr><td>DSAC-T</td><td>0</td><td>100</td><td>100</td><td>80</td><td>100</td><td>90</td></tr><tr><td>TQC</td><td>10</td><td>100</td><td>100</td><td>30</td><td>100</td><td>0</td></tr><tr><td>TIQC</td><td>0</td><td>100</td><td>100</td><td>100</td><td>100</td><td>80</td></tr><tr><td>TAQC (ours)</td><td>100</td><td>100</td><td>100</td><td>100</td><td>100</td><td>98</td></tr></tbody>
+      </table>
+    </div>
+    
+          <div class="figure-stack experiment-figures">
+    <figure class="paper-figure video-figure medium">
+      <video class="auto-demo" controls autoplay muted loop playsinline preload="metadata" poster="assets/video/poster/s_path.jpg" aria-label="Unseen trajectory: S-shape">
+        <source src="assets/video/s_path.mp4" type="video/mp4">
+      </video>
+      <figcaption>
+        <h4>Unseen trajectory: S-shape</h4>
+      </figcaption>
+    </figure>
+    
+    <figure class="paper-figure video-figure medium">
+      <video class="auto-demo" controls autoplay muted loop playsinline preload="metadata" poster="assets/video/poster/double_spiral.jpg" aria-label="Unseen trajectory: Double Helix">
+        <source src="assets/video/double_spiral.mp4" type="video/mp4">
+      </video>
+      <figcaption>
+        <h4>Unseen trajectory: Double Helix</h4>
+      </figcaption>
+    </figure>
+    
+    <figure class="paper-figure video-figure medium">
+      <video class="auto-demo" controls autoplay muted loop playsinline preload="metadata" poster="assets/video/poster/square.jpg" aria-label="Unseen trajectory: Polyline">
+        <source src="assets/video/square.mp4" type="video/mp4">
+      </video>
+      <figcaption>
+        <h4>Unseen trajectory: Polyline</h4>
+      </figcaption>
+    </figure>
+    
+    <figure class="paper-figure video-figure medium">
+      <video class="auto-demo" controls autoplay muted loop playsinline preload="metadata" poster="assets/video/poster/figure8.jpg" aria-label="Unseen trajectory: Figure-8">
+        <source src="assets/video/figure8.mp4" type="video/mp4">
+      </video>
+      <figcaption>
+        <h4>Unseen trajectory: Figure-8</h4>
+      </figcaption>
+    </figure>
+    
+    <figure class="paper-figure video-figure medium">
+      <video class="auto-demo" controls autoplay muted loop playsinline preload="metadata" poster="assets/video/poster/conical_helix.jpg" aria-label="Unseen trajectory: Conical Helix">
+        <source src="assets/video/conical_helix.mp4" type="video/mp4">
+      </video>
+      <figcaption>
+        <h4>Unseen trajectory: Conical Helix</h4>
+      </figcaption>
+    </figure>
+    
+    <figure class="paper-figure video-figure medium">
+      <video class="auto-demo" controls autoplay muted loop playsinline preload="metadata" poster="assets/video/poster/zigzag_3d.jpg" aria-label="Unseen trajectory: Comb Scanning">
+        <source src="assets/video/zigzag_3d.mp4" type="video/mp4">
+      </video>
+      <figcaption>
+        <h4>Unseen trajectory: Comb Scanning</h4>
+      </figcaption>
+    </figure>
+    </div>
+        </div>
+        
+        <div class="subsection">
+          <h3>Robustness with domain randomization</h3>
+          <p>On the challenging comb-scanning task, the paper compares TAQC trained with and without domain randomization over five increasingly difficult disturbance settings. With domain randomization, the controller generally maintains higher success rates and lower tracking errors as disturbances intensify.</p>
+          
+          
+          
+    <div class="table-wrap">
+      <div class="table-caption">Robustness comparison with versus without domain randomization</div>
+      <table>
+        <thead><tr><th>Parameter setting</th><th>With DR: ATE</th><th>With DR: AHE</th><th>With DR: SR</th><th>Without DR: ATE</th><th>Without DR: AHE</th><th>Without DR: SR</th></tr></thead>
+        <tbody><tr><td>(0.3, 0.25, 0.03, 0.10)</td><td>0.984±0.004</td><td>1.254±0.020</td><td>100</td><td>0.983±0.016</td><td>1.541±0.112</td><td>100</td></tr><tr><td>(0.6, 0.55, 0.05, 0.15)</td><td>0.987±0.006</td><td>1.240±0.019</td><td>100</td><td>1.017±0.096</td><td>1.561±0.119</td><td>83</td></tr><tr><td>(3.0, 1.25, 0.20, 0.30)</td><td>0.992±0.013</td><td>1.220±0.066</td><td>97</td><td>1.025±0.115</td><td>1.575±0.121</td><td>83</td></tr><tr><td>(5.0, 1.34, 0.25, 0.35)</td><td>0.989±0.012</td><td>1.183±0.087</td><td>97</td><td>1.062±0.205</td><td>1.617±0.156</td><td>73</td></tr><tr><td>(8.0, 1.45, 0.30, 0.50)</td><td>0.985±0.013</td><td>1.176±0.093</td><td>95</td><td>1.169±0.457</td><td>1.541±0.186</td><td>70</td></tr></tbody>
+      </table>
+    </div>
+    
+          <div class="figure-stack experiment-figures"></div>
+        </div>
+        
+  </section>
+
+  <section id="conclusion" class="section">
+    <h2>Current Status</h2>
+    <p>This manuscript is currently under review. Data and code are available upon reasonable request by contacting l_123@tju.edu.cn.</p>
+  </section>
+
+</main>
+<script src="assets/js/video-autoplay.js" defer></script>
+</body>
+</html>
