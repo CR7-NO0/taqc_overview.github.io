@@ -10,4 +10,3 @@
 - `tools/build_site.py` 控制网页生成。首页主要贡献部分文字目前在此脚本中定义。
 - 运行 `python tools/build_site.py` 后更新根目录 `index.html` 与 `cn/index.html`。
 - 六段视频在 `assets/video/`，视频封面在 `assets/video/poster/`。
-- 文件夹中不包含 LaTeX 论文原稿、训练代码或模型权重。
