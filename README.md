@@ -6,6 +6,6 @@ The website provides a summarized presentation of the research motivation, propo
 
 The content is intended for research presentation and visualization rather than full paper reproduction.
 
-**Website:** https://cr7-n00.github.io/taqc_overview.github.io/
+**Website:** [https://cr7-n00.github.io/taqc_overview.github.io/](https://cr7-no0.github.io/taqc_overview.github.io/index.html)
 
 **Status:** The manuscript is currently under review. Data and code are available upon reasonable request.
