@@ -3,6 +3,8 @@
   "nav": {
     "motivation": "Motivation",
     "framework": "Framework",
+    "task": "Task",
+    "terrain": "Seabed terrain",
     "baselines": "Baselines",
     "metrics": "Metrics",
     "experiments": "Experiments",
@@ -11,9 +13,9 @@
   "eyebrow": "Single-paper showcase · reorganized after RAPID-route",
   "title": "Autonomous UUV Control for Multi-Waypoint Tracking through Distributional Reinforcement Learning",
   "subtitle": "TAQC: Truncated Adaptive Quantile Critics",
-  "intro": "An end-to-end, map-free UUV multi-waypoint controller combining adaptive distributional reinforcement learning with domain randomization for robust tracking in uncertain underwater environments.",
+  "intro": "TAQC is an end-to-end distributional reinforcement learning approach for UUV multi-waypoint tracking. Adaptive quantile modeling, multi-critic truncation, and domain randomization are evaluated on 2D and 3D tasks, unseen trajectories, and diverse simulated seabed environments.",
   "affiliation": "Tianjin University · Laoshan Laboratory",
-  "abstract": "Unmanned Underwater Vehicles (UUVs) are essential tools for ocean exploration and underwater operations, with wide applications in marine resource exploration, underwater structure inspection, and seabed mapping. This study applies reinforcement learning to UUV path following, where the vehicle accurately tracks a sequence of waypoints under disturbances. Firstly, an end-to-end UUV path following framework is developed, where deep reinforcement learning learns control policies directly from state observations in map-free environments. Furthermore, an improved method with a distributional critic and a learnable quantile network is proposed to generate adaptive, non-uniform quantiles for efficient and stable policy learning. Finally, domain randomization is employed to enhance robustness and generalization. Simulation results indicate that TAQC reaches successful task performance with fewer training interactions, requires fewer steps to complete the 2D and 3D training tasks, and achieves high success rates on previously unseen trajectories while maintaining competitive tracking accuracy.",
+  "abstract": "This work presents Truncated Adaptive Quantile Critics (TAQC) for autonomous UUV multi-waypoint tracking under uncertain underwater conditions. A learnable Fraction Proposal Network enables non-uniform return-distribution quantiles, which are incorporated into a truncated multi-critic architecture through a probability-mass-weighted critic loss. Domain randomization varies currents, hydrodynamic parameters, and initial states during training. Simulation studies on 2D and 3D waypoint tasks demonstrate improved learning and task-completion efficiency, competitive tracking accuracy, and high success rates on unseen trajectories. Additional trials explore tracking in six seabed scenarios constructed using bathymetric terrain representations.",
   "motivation": {
     "title": "Research motivation",
     "subtitle": "Why study RL-based multi-waypoint UUV control?",
@@ -184,7 +186,7 @@
   },
   "experiments": {
     "title": "Experimental results and analysis",
-    "subtitle": "Simulation results for 2D tracking, 3D tracking, unseen trajectories, and disturbance robustness",
+    "subtitle": "2D and 3D tracking, unseen trajectories, disturbance robustness, and simulated seabed scenarios",
     "sections": [
       {
         "title": "2D path-following experiments",
@@ -524,6 +526,43 @@
           ]
         },
         "images": []
+      },
+      {
+        "title": "Seabed terrain tracking demonstrations",
+        "summary": "The trained TAQC policy is further evaluated in six simulated seabed scenarios with varying terrain geometry and trajectory depth. The representative demonstrations illustrate tracking along prescribed three-dimensional trajectories (Fig. 16 of the manuscript).",
+        "images": [
+          {
+            "title": "Seabed scenario 1",
+            "video": "01.mp4",
+            "layout": "medium"
+          },
+          {
+            "title": "Seabed scenario 2",
+            "video": "02.mp4",
+            "layout": "medium"
+          },
+          {
+            "title": "Seabed scenario 3",
+            "video": "03.mp4",
+            "layout": "medium"
+          },
+          {
+            "title": "Seabed scenario 4",
+            "video": "04.mp4",
+            "layout": "medium"
+          },
+          {
+            "title": "Seabed scenario 5",
+            "video": "05.mp4",
+            "layout": "medium"
+          },
+          {
+            "title": "Seabed scenario 6",
+            "video": "06.mp4",
+            "layout": "medium"
+          }
+        ],
+        "video_note": "Note: Demonstration videos are presented for visualization; playback timing should not be interpreted as measured UUV travel speed."
       }
     ]
   },
@@ -539,5 +578,27 @@
     "email": "zhongkegao@tju.edu.cn",
     "bib_title": "Citation",
     "bib_note": "Publication venue and DOI were not included in the uploaded TeX manuscript; the BibTeX below is provisional."
+  },
+  "terrain": {
+    "title": "Bathymetric terrain representation",
+    "subtitle": "Seabed environments constructed from GEBCO 2025 bathymetry",
+    "paragraphs": [
+      "GEBCO 2025 bathymetric data from 15.8266°–16.9246° N and 111.4766°–112.5746° E in the South China Sea are used to construct diverse simulated seabed environments.",
+      "Representative bathymetric regions are spatially rescaled to local 50 m × 50 m workspaces while preserving characteristic elevation variations. Additional synthetic terrain features increase geometric diversity for trajectory-tracking evaluation."
+    ],
+    "images": [
+      {
+        "src": "region.png",
+        "title": "Study region in the South China Sea",
+        "desc": "The red rectangle marks the selected geographical study region.",
+        "layout": "medium"
+      },
+      {
+        "src": "seabed.png",
+        "title": "Three-dimensional seabed bathymetry",
+        "desc": "Bathymetric elevation characteristics of the study region.",
+        "layout": "medium"
+      }
+    ]
   }
 }

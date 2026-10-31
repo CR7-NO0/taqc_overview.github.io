@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="An end-to-end, map-free UUV multi-waypoint controller combining adaptive distributional reinforcement learning with domain randomization for robust tracking in uncertain underwater environments.">
+  <meta name="description" content="TAQC is an end-to-end distributional reinforcement learning approach for UUV multi-waypoint tracking. Adaptive quantile modeling, multi-critic truncation, and domain randomization are evaluated on 2D and 3D tasks, unseen trajectories, and diverse simulated seabed environments.">
   <title>Autonomous UUV Control for Multi-Waypoint Tracking through Distributional Reinforcement Learning</title>
   <link rel="stylesheet" href="assets/style.css">
 </head>
@@ -11,7 +11,7 @@
 <header class="topbar">
   <div class="bar-inner">
     <a class="brand" href="#top">TAQC</a>
-    <nav><a href="#motivation">Motivation</a><a href="#framework">Framework</a><a href="#baselines">Baselines</a><a href="#metrics">Metrics</a><a href="#experiments">Experiments</a><a href="#conclusion">Current Status</a></nav>
+    <nav><a href="#motivation">Motivation</a><a href="#framework">Framework</a><a href="#task">Task</a><a href="#terrain">Seabed terrain</a><a href="#baselines">Baselines</a><a href="#metrics">Metrics</a><a href="#experiments">Experiments</a><a href="#conclusion">Current Status</a></nav>
     <a class="lang" href="cn/index.html">中文</a>
   </div>
 </header>
@@ -19,7 +19,7 @@
   <section class="landing">
     <h1>Autonomous UUV Control for Multi-Waypoint Tracking through Distributional Reinforcement Learning</h1>
     <div class="subtitle">TAQC: Truncated Adaptive Quantile Critics</div>
-    <p class="intro">An end-to-end, map-free UUV multi-waypoint controller combining adaptive distributional reinforcement learning with domain randomization for robust tracking in uncertain underwater environments.</p>
+    <p class="intro">TAQC is an end-to-end distributional reinforcement learning approach for UUV multi-waypoint tracking. Adaptive quantile modeling, multi-critic truncation, and domain randomization are evaluated on 2D and 3D tasks, unseen trajectories, and diverse simulated seabed environments.</p>
 
     <h2>Main contributions</h2>
     <ul class="feature-bullets"><li><b>End-to-end UUV tracking control：</b>RL framework for sequential waypoint tracking.</li><li><b>Distributional RL：</b>Return-distribution modeling improves learning efficiency and stability.</li><li><b>TAQC method：</b>TQC extended with a learnable fraction proposal network and a mass-weighted critic loss.</li><li><b>Domain randomization：</b>Enhance the generalization capability for unseen trajectories under disturbances.</li></ul>
@@ -60,7 +60,7 @@
     </div>
   </section>
 
-  <section class="section">
+  <section id="task" class="section">
     <h2>Task description</h2>
     <p>The UUV starts from a randomized initial region and tracks a sequence of waypoints under disturbances. When the 3D distance to the current waypoint falls below a threshold, the target switches to the next waypoint. The problem is formulated as a continuous-state, continuous-action reinforcement-learning task.</p>
     <div class="figure-stack task-figures">
@@ -86,6 +86,33 @@
     </div>
   </section>
 
+  <section id="terrain" class="section">
+      <h2>Bathymetric terrain representation</h2>
+      <p class="section-subtitle">Seabed environments constructed from GEBCO 2025 bathymetry</p>
+      <div class="text-block"><p>GEBCO 2025 bathymetric data from 15.8266°–16.9246° N and 111.4766°–112.5746° E in the South China Sea are used to construct diverse simulated seabed environments.</p><p>Representative bathymetric regions are spatially rescaled to local 50 m × 50 m workspaces while preserving characteristic elevation variations. Additional synthetic terrain features increase geometric diversity for trajectory-tracking evaluation.</p></div>
+      <div class="figure-stack terrain-figures">
+    <figure class="paper-figure medium">
+      <a href="assets/img/region.png" target="_blank" aria-label="Open full image">
+        <img src="assets/img/region.png" alt="Study region in the South China Sea" loading="lazy">
+      </a>
+      <figcaption>
+        <h4>Study region in the South China Sea</h4>
+        <p>The red rectangle marks the selected geographical study region.</p>
+      </figcaption>
+    </figure>
+    
+    <figure class="paper-figure medium">
+      <a href="assets/img/seabed.png" target="_blank" aria-label="Open full image">
+        <img src="assets/img/seabed.png" alt="Three-dimensional seabed bathymetry" loading="lazy">
+      </a>
+      <figcaption>
+        <h4>Three-dimensional seabed bathymetry</h4>
+        <p>Bathymetric elevation characteristics of the study region.</p>
+      </figcaption>
+    </figure>
+    </div>
+    </section>
+
   <section id="baselines" class="section">
     <h2>Baselines and experimental setting</h2>
     <p>All experiments are conducted in the bluerov2_gym environment. The 2D training task uses a circle of radius 5 m; the 3D training task uses a helix of the same radius with 30 waypoints. Each episode lasts at most 800 steps. The training budgets are 500k steps for the 2D task and 1M steps for the 3D task.</p>
@@ -99,7 +126,7 @@
 
   <section id="experiments" class="section">
     <h2>Experimental results and analysis</h2>
-    <p>Simulation results for 2D tracking, 3D tracking, unseen trajectories, and disturbance robustness</p>
+    <p>2D and 3D tracking, unseen trajectories, disturbance robustness, and simulated seabed scenarios</p>
     
         <div class="subsection">
           <h3>2D path-following experiments</h3>
@@ -283,6 +310,69 @@
     </div>
     
           <div class="figure-stack experiment-figures"></div>
+        </div>
+        
+        <div class="subsection">
+          <h3>Seabed terrain tracking demonstrations</h3>
+          <p>The trained TAQC policy is further evaluated in six simulated seabed scenarios with varying terrain geometry and trajectory depth. The representative demonstrations illustrate tracking along prescribed three-dimensional trajectories (Fig. 16 of the manuscript).</p>
+          
+          <p class="video-speed-note">Note: Demonstration videos are presented for visualization; playback timing should not be interpreted as measured UUV travel speed.</p>
+          
+          <div class="figure-stack experiment-figures">
+    <figure class="paper-figure video-figure medium">
+      <video class="auto-demo" controls autoplay muted loop playsinline preload="metadata" poster="assets/video/poster/01.jpg" aria-label="Seabed scenario 1">
+        <source src="assets/video/01.mp4" type="video/mp4">
+      </video>
+      <figcaption>
+        <h4>Seabed scenario 1</h4>
+      </figcaption>
+    </figure>
+    
+    <figure class="paper-figure video-figure medium">
+      <video class="auto-demo" controls autoplay muted loop playsinline preload="metadata" poster="assets/video/poster/02.jpg" aria-label="Seabed scenario 2">
+        <source src="assets/video/02.mp4" type="video/mp4">
+      </video>
+      <figcaption>
+        <h4>Seabed scenario 2</h4>
+      </figcaption>
+    </figure>
+    
+    <figure class="paper-figure video-figure medium">
+      <video class="auto-demo" controls autoplay muted loop playsinline preload="metadata" poster="assets/video/poster/03.jpg" aria-label="Seabed scenario 3">
+        <source src="assets/video/03.mp4" type="video/mp4">
+      </video>
+      <figcaption>
+        <h4>Seabed scenario 3</h4>
+      </figcaption>
+    </figure>
+    
+    <figure class="paper-figure video-figure medium">
+      <video class="auto-demo" controls autoplay muted loop playsinline preload="metadata" poster="assets/video/poster/04.jpg" aria-label="Seabed scenario 4">
+        <source src="assets/video/04.mp4" type="video/mp4">
+      </video>
+      <figcaption>
+        <h4>Seabed scenario 4</h4>
+      </figcaption>
+    </figure>
+    
+    <figure class="paper-figure video-figure medium">
+      <video class="auto-demo" controls autoplay muted loop playsinline preload="metadata" poster="assets/video/poster/05.jpg" aria-label="Seabed scenario 5">
+        <source src="assets/video/05.mp4" type="video/mp4">
+      </video>
+      <figcaption>
+        <h4>Seabed scenario 5</h4>
+      </figcaption>
+    </figure>
+    
+    <figure class="paper-figure video-figure medium">
+      <video class="auto-demo" controls autoplay muted loop playsinline preload="metadata" poster="assets/video/poster/06.jpg" aria-label="Seabed scenario 6">
+        <source src="assets/video/06.mp4" type="video/mp4">
+      </video>
+      <figcaption>
+        <h4>Seabed scenario 6</h4>
+      </figcaption>
+    </figure>
+    </div>
         </div>
         
   </section>

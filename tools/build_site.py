@@ -119,6 +119,16 @@ for lang in ['zh', 'en']:
     motivation_paras = ''.join(f'<p>{esc(p)}</p>' for p in d['motivation']['paragraphs'])
     task_figs = ''.join(render_figure(prefix, x) for x in d['task']['images'])
     framework_figs = ''.join(render_figure(prefix, x) for x in d['framework']['images'])
+    terrain = d.get('terrain', {})
+    terrain_paras = ''.join(f'<p>{esc(p)}</p>' for p in terrain.get('paragraphs', []))
+    terrain_figs = ''.join(render_figure(prefix, x) for x in terrain.get('images', []))
+    terrain_html = (f'''<section id="terrain" class="section">
+      <h2>{esc(terrain['title'])}</h2>
+      <p class="section-subtitle">{esc(terrain.get('subtitle', ''))}</p>
+      <div class="text-block">{terrain_paras}</div>
+      <div class="figure-stack terrain-figures">{terrain_figs}</div>
+    </section>''' if terrain else '')
+
 
     baseline_html = []
     for group in d['baselines']['groups']:
@@ -218,11 +228,13 @@ for lang in ['zh', 'en']:
     <div class="figure-stack framework-figures">{framework_figs}</div>
   </section>
 
-  <section class="section">
+  <section id="task" class="section">
     <h2>{task_title}</h2>
     <p>{esc(d['task']['text'])}</p>
     <div class="figure-stack task-figures">{task_figs}</div>
   </section>
+
+  {terrain_html}
 
   <section id="baselines" class="section">
     <h2>{baseline_title}</h2>

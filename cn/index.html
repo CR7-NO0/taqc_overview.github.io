@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="面向未知和动态扰动环境，论文提出一种结合自适应分位分布学习与域随机化的端到端 UUV 多航点跟踪控制框架 TAQC，在二维、三维以及未见轨迹任务中获得了更高的训练效率与更强的泛化能力。">
+  <meta name="description" content="本研究提出面向 UUV 多航点跟踪的分布式强化学习方法 TAQC，结合自适应分位建模、多评论家截断和域随机化，并通过二维、三维、未见轨迹及多样化海底地形仿真场景评价其性能。">
   <title>基于分布式强化学习的 UUV 多航点自主跟踪控制</title>
   <link rel="stylesheet" href="../assets/style.css">
 </head>
@@ -11,7 +11,7 @@
 <header class="topbar">
   <div class="bar-inner">
     <a class="brand" href="#top">TAQC</a>
-    <nav><a href="#motivation">研究动机</a><a href="#framework">算法框架</a><a href="#baselines">对比算法</a><a href="#metrics">评价指标</a><a href="#experiments">实验结果</a><a href="#conclusion">当前状态</a></nav>
+    <nav><a href="#motivation">研究动机</a><a href="#framework">算法框架</a><a href="#task">任务描述</a><a href="#terrain">海底地形</a><a href="#baselines">对比算法</a><a href="#metrics">评价指标</a><a href="#experiments">实验结果</a><a href="#conclusion">当前状态</a></nav>
     <a class="lang" href="../index.html">EN</a>
   </div>
 </header>
@@ -19,7 +19,7 @@
   <section class="landing">
     <h1>基于分布式强化学习的 UUV 多航点自主跟踪控制</h1>
     <div class="subtitle">Autonomous UUV Control for Multi-Waypoint Tracking through Distributional Reinforcement Learning</div>
-    <p class="intro">面向未知和动态扰动环境，论文提出一种结合自适应分位分布学习与域随机化的端到端 UUV 多航点跟踪控制框架 TAQC，在二维、三维以及未见轨迹任务中获得了更高的训练效率与更强的泛化能力。</p>
+    <p class="intro">本研究提出面向 UUV 多航点跟踪的分布式强化学习方法 TAQC，结合自适应分位建模、多评论家截断和域随机化，并通过二维、三维、未见轨迹及多样化海底地形仿真场景评价其性能。</p>
 
     <h2>主要贡献</h2>
     <ul class="feature-bullets"><li><b>端到端 UUV 跟踪控制：</b>基于强化学习的多航点连续跟踪策略。</li><li><b>分布式强化学习：</b>通过回报的分布建模提升学习效率与稳定性。</li><li><b>TAQC 方法：</b>在 TQC 框架中引入可学习分位提议网络与区间质量加权损失。</li><li><b>域随机化训练：</b>增强在存在干扰情况下对未见轨迹的泛化能力。</li></ul>
@@ -60,7 +60,7 @@
     </div>
   </section>
 
-  <section class="section">
+  <section id="task" class="section">
     <h2>任务定义与问题描述</h2>
     <p>UUV 从起始区域出发，在海流等扰动作用下依次到达预设目标航点。当与当前目标航点的三维距离低于阈值时，目标自动切换到下一个航点。论文同时采用 NED 坐标系与艇体坐标系描述 UUV 运动状态，并将该问题建模为连续状态、连续动作的强化学习任务。</p>
     <div class="figure-stack task-figures">
@@ -86,6 +86,33 @@
     </div>
   </section>
 
+  <section id="terrain" class="section">
+      <h2>海底地形表示</h2>
+      <p class="section-subtitle">基于 GEBCO 2025 海底地形数据构建仿真场景</p>
+      <div class="text-block"><p>采用 GEBCO 2025 海底地形数据，研究区域位于南海（北纬 15.8266°–16.9246°，东经 111.4766°–112.5746°）。</p><p>选取具有代表性的地形区域，并将其映射至局部 50 m × 50 m 仿真工作空间，保留典型高程变化；同时加入合成地形特征，增加用于轨迹跟踪评估的地形多样性。</p></div>
+      <div class="figure-stack terrain-figures">
+    <figure class="paper-figure medium">
+      <a href="../assets/img/region.png" target="_blank" aria-label="Open full image">
+        <img src="../assets/img/region.png" alt="南海研究区域" loading="lazy">
+      </a>
+      <figcaption>
+        <h4>南海研究区域</h4>
+        <p>红色方框表示选取的地理研究区域。</p>
+      </figcaption>
+    </figure>
+    
+    <figure class="paper-figure medium">
+      <a href="../assets/img/seabed.png" target="_blank" aria-label="Open full image">
+        <img src="../assets/img/seabed.png" alt="三维海底地形表示" loading="lazy">
+      </a>
+      <figcaption>
+        <h4>三维海底地形表示</h4>
+        <p>研究区域的海底地形高程特征。</p>
+      </figcaption>
+    </figure>
+    </div>
+    </section>
+
   <section id="baselines" class="section">
     <h2>对比算法与实验设置</h2>
     <p>所有实验均在 bluerov2_gym 环境中进行，采用 BlueROV2 模型。二维训练任务为半径 5 m 的圆形轨迹，三维训练任务为同半径、30 个航点组成的螺旋轨迹。每回合上限 800 步，二维训练预算为 50 万步，三维训练预算为 100 万步。</p>
@@ -99,7 +126,7 @@
 
   <section id="experiments" class="section">
     <h2>实验结果与分析</h2>
-    <p>将实验内容统一放在后部展示，按二维、三维、泛化与鲁棒性展开</p>
+    <p>二维与三维跟踪、未见轨迹泛化、域随机化鲁棒性和海底地形仿真场景</p>
     
         <div class="subsection">
           <h3>二维路径跟踪实验</h3>
@@ -283,6 +310,69 @@
     </div>
     
           <div class="figure-stack experiment-figures"></div>
+        </div>
+        
+        <div class="subsection">
+          <h3>海底地形跟踪演示</h3>
+          <p>将训练后的 TAQC 策略进一步应用于六种具有不同地形几何形态和轨迹深度变化的海底仿真场景。视频展示预设三维轨迹的代表性跟踪过程，对应论文图 16。</p>
+          
+          <p class="video-speed-note">注：视频用于展示仿真轨迹跟踪过程，播放速度不代表 UUV 的实际航行速度。</p>
+          
+          <div class="figure-stack experiment-figures">
+    <figure class="paper-figure video-figure medium">
+      <video class="auto-demo" controls autoplay muted loop playsinline preload="metadata" poster="../assets/video/poster/01.jpg" aria-label="海底场景 1">
+        <source src="../assets/video/01.mp4" type="video/mp4">
+      </video>
+      <figcaption>
+        <h4>海底场景 1</h4>
+      </figcaption>
+    </figure>
+    
+    <figure class="paper-figure video-figure medium">
+      <video class="auto-demo" controls autoplay muted loop playsinline preload="metadata" poster="../assets/video/poster/02.jpg" aria-label="海底场景 2">
+        <source src="../assets/video/02.mp4" type="video/mp4">
+      </video>
+      <figcaption>
+        <h4>海底场景 2</h4>
+      </figcaption>
+    </figure>
+    
+    <figure class="paper-figure video-figure medium">
+      <video class="auto-demo" controls autoplay muted loop playsinline preload="metadata" poster="../assets/video/poster/03.jpg" aria-label="海底场景 3">
+        <source src="../assets/video/03.mp4" type="video/mp4">
+      </video>
+      <figcaption>
+        <h4>海底场景 3</h4>
+      </figcaption>
+    </figure>
+    
+    <figure class="paper-figure video-figure medium">
+      <video class="auto-demo" controls autoplay muted loop playsinline preload="metadata" poster="../assets/video/poster/04.jpg" aria-label="海底场景 4">
+        <source src="../assets/video/04.mp4" type="video/mp4">
+      </video>
+      <figcaption>
+        <h4>海底场景 4</h4>
+      </figcaption>
+    </figure>
+    
+    <figure class="paper-figure video-figure medium">
+      <video class="auto-demo" controls autoplay muted loop playsinline preload="metadata" poster="../assets/video/poster/05.jpg" aria-label="海底场景 5">
+        <source src="../assets/video/05.mp4" type="video/mp4">
+      </video>
+      <figcaption>
+        <h4>海底场景 5</h4>
+      </figcaption>
+    </figure>
+    
+    <figure class="paper-figure video-figure medium">
+      <video class="auto-demo" controls autoplay muted loop playsinline preload="metadata" poster="../assets/video/poster/06.jpg" aria-label="海底场景 6">
+        <source src="../assets/video/06.mp4" type="video/mp4">
+      </video>
+      <figcaption>
+        <h4>海底场景 6</h4>
+      </figcaption>
+    </figure>
+    </div>
         </div>
         
   </section>
